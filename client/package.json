@@ -21,7 +21,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "ganache": "ganache --wallet.seed \"achieve drastic sound special sugar sunny talk tennis trip universe vocal zebra\""
   },
   "eslintConfig": {
     "extends": [

@@ -23,11 +23,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"react-scripts start\" \"npm:ganache\"",
+    "start": "concurrently \"npm:ganache\" \"npm:deploy-contracts\" \"npm:dev-server\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "ganache": "ganache --wallet.seed \"achieve drastic sound special sugar sunny talk tennis trip universe vocal zebra\""
+    "dev-server": "react-scripts start",
+    "deploy-contracts": "wait-on tcp:8545 && truffle compile && truffle migrate",
+    "ganache": "ganache --wallet.seed \"achieve drastic sound special sugar sunny talk tennis trip universe vocal zebra\"",
+    "console": "truffle console"
   },
   "eslintConfig": {
     "extends": [

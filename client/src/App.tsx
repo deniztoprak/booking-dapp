@@ -1,8 +1,14 @@
-import React from "react";
-import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
+import { StartPage } from "./pages/StartPage/StartPage";
 
 function App() {
-  return <div className="App">Test</div>;
+  return (
+    <Routes>
+      <Route path="/" element={<StartPage />} />
+      <Route path="admin" element={<AdminPanel />} />
+    </Routes>
+  );
 }
 
 export default App;

@@ -5,7 +5,8 @@
   "devDependencies": {
     "concurrently": "^7.0.0",
     "ganache": "^7.0.2",
-    "truffle": "^5.4.32"
+    "truffle": "^5.4.32",
+    "wait-on": "^6.0.0"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.2",

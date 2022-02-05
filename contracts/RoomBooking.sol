@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.11;
+
+contract RoomBooking {
+    address public owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+}

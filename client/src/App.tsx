@@ -1,28 +1,32 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 import { StartPage } from "./pages/StartPage/StartPage";
+import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 
 export function App() {
   return (
     <main>
       <Navbar bg="primary" variant="dark">
         <Container fluid>
-          <Link className="navbar-brand" to="/">
+          <Navbar.Brand as={NavLink} to="/">
             Booking Dapp
-          </Link>
-          <Nav className="me-auto my-2">
-            <Link className="nav-link" to="/admin">
+          </Navbar.Brand>
+          <Nav className="me-auto">
+            <Nav.Link as={NavLink} to="/admin-panel">
               Admin Panel
-            </Link>
-            <Nav.Link href="/admin">Coca Cola</Nav.Link>
-            <Nav.Link href="/admin">Pepsi</Nav.Link>
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/coke-dashboard">
+              Coke Dashboard
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/pepsi-dashboard">
+              Pepsi Dashboard
+            </Nav.Link>
           </Nav>
         </Container>
       </Navbar>
       <Routes>
         <Route path="/" element={<StartPage />} />
-        <Route path="admin" element={<AdminPanel />} />
+        <Route path="admin-panel" element={<AdminPanel />} />
       </Routes>
     </main>
   );

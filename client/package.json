@@ -34,7 +34,7 @@
     "eject": "react-scripts eject",
     "dev-server": "react-scripts start",
     "deploy-contracts": "wait-on tcp:8545 && truffle compile && truffle migrate",
-    "ganache": "ganache --wallet.seed \"achieve drastic sound special sugar sunny talk tennis trip universe vocal zebra\"",
+    "ganache": "ganache --chain.chainId \"1337\" --chain.networkId \"1337\" --wallet.seed \"eyebrow recycle giggle author pause cheap animal can duck grief two agree\"",
     "console": "truffle console"
   },
   "eslintConfig": {

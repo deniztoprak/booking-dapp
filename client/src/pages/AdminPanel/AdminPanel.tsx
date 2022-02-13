@@ -1,14 +1,20 @@
+import { getDefaultProvider, utils } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Container, Form, Row } from 'react-bootstrap';
-import { useAccount, useContract, useNetwork, useSigner } from 'wagmi';
+import { Alert, Button, Container, Form, Row, Toast, ToastContainer } from 'react-bootstrap';
+import { useAccount, useContract, useNetwork, useSigner, useContractEvent } from 'wagmi';
 import { Web3Connector } from '../../components/Web3Connector/Web3Connector';
 import { defaults } from '../../constants/defaults';
 import RoomBooking from '../../contracts/RoomBooking.json';
 
 export function AdminPanel() {
+  const adminForm = React.createRef<HTMLFormElement>();
   const [ownerAddress, setOwnerAddress] = useState('');
-  const [cokeAddress, setCokeAddress] = useState('');
-  const [pepsiAddress, setPepsiAddress] = useState('');
+  const [employeeCompany, setEmployeeCompany] = useState('');
+  const [employeeAddress, setEmployeeAddress] = useState('');
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastText, setToastText] = useState('');
 
   const [{ data: networkData }] = useNetwork();
   const [{ data: accountData }] = useAccount();
@@ -17,22 +23,59 @@ export function AdminPanel() {
   const networkId = (networkData.chain?.id || defaults.networkId) as keyof typeof RoomBooking.networks;
   const isAdminUser = accountData?.address === ownerAddress;
 
-  const contract = useContract({
+  const contractConfig = {
     addressOrName: RoomBooking.networks[networkId].address,
     contractInterface: RoomBooking.abi,
-    signerOrProvider: signerData,
+    signerOrProvider: signerData || getDefaultProvider(),
+  };
+
+  const contract = useContract(contractConfig);
+
+  useContractEvent(contractConfig, 'RoleGranted', ([role, account]) => {
+    setToastText(`Employee ${account} has been added`);
+    setIsToastOpen(true);
+    setIsTransactionPending(false);
   });
 
-  const onAddressSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    console.log(cokeAddress, pepsiAddress);
+  useContractEvent(contractConfig, 'RoleRevoked', ([role, account]) => {
+    setToastText(`Employee ${account} has been removed`);
+    setIsToastOpen(true);
+    setIsTransactionPending(false);
+  });
+
+  const onCompanyChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setEmployeeCompany(event.target.value);
   };
 
   const onAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.id === 'cokeAddress') {
-      setCokeAddress(event.target.value);
-    } else if (event.target.id === 'pepsiAddress') {
-      setPepsiAddress(event.target.value);
+    setEmployeeAddress(event.target.value);
+  };
+
+  const onEmployeeAdd = async (event: React.FormEvent) => {
+    if (adminForm.current?.reportValidity()) {
+      setIsTransactionPending(true);
+      const employeeRole = utils.keccak256(utils.toUtf8Bytes(employeeCompany));
+      try {
+        await contract.addEmployee(employeeRole, getAddress(employeeAddress));
+      } catch (error) {
+        setToastText('Transaction rejected');
+        setIsToastOpen(true);
+        setIsTransactionPending(false);
+      }
+    }
+  };
+
+  const onEmployeeRemove = async (event: React.FormEvent) => {
+    if (adminForm.current?.reportValidity()) {
+      setIsTransactionPending(true);
+      const employeeRole = utils.keccak256(utils.toUtf8Bytes(employeeCompany));
+      try {
+        await contract.removeEmployee(employeeRole, getAddress(employeeAddress));
+      } catch (error) {
+        setToastText('Transaction rejected');
+        setIsToastOpen(true);
+        setIsTransactionPending(false);
+      }
     }
   };
 
@@ -57,18 +100,25 @@ export function AdminPanel() {
             ownerAddress &&
             (isAdminUser ? (
               <>
-                <h2>Whitelist Wallets</h2>
-                <Form onSubmit={onAddressSubmit}>
-                  <Form.Group className="mt-3" controlId="cokeAddress">
-                    <Form.Label>Coke Wallet Address:</Form.Label>
+                <h2>Add / Remove Employees</h2>
+                <Form ref={adminForm}>
+                  <Form.Group className="mt-3" controlId="role">
+                    <Form.Label>Select Company</Form.Label>
+                    <Form.Select onChange={onCompanyChange} required>
+                      <option></option>
+                      <option value="COKE_EMPLOYEE">Coke</option>
+                      <option value="PEPSI_EMPLOYEE">Pepsi</option>
+                    </Form.Select>
+                  </Form.Group>
+                  <Form.Group className="my-3" controlId="address">
+                    <Form.Label>Employee's Wallet Address:</Form.Label>
                     <Form.Control type="text" placeholder="Enter wallet address" onChange={onAddressChange} required />
                   </Form.Group>
-                  <Form.Group className="mt-3" controlId="pepsiAddress">
-                    <Form.Label>Pepsi Wallet Address:</Form.Label>
-                    <Form.Control type="text" placeholder="Enter wallet address" onChange={onAddressChange} required />
-                  </Form.Group>
-                  <Button className="mt-3" variant="primary" type="submit">
-                    Submit
+                  <Button disabled={isTransactionPending} variant="info" onClick={onEmployeeAdd}>
+                    Add Employee
+                  </Button>
+                  <Button disabled={isTransactionPending} className="ms-3" variant="danger" onClick={onEmployeeRemove}>
+                    Remove Employee
                   </Button>
                 </Form>
               </>
@@ -79,6 +129,21 @@ export function AdminPanel() {
             ))}
         </Row>
       </Container>
+      <ToastContainer position="top-end" className="p-3">
+        <Toast
+          show={isToastOpen}
+          onClose={() => {
+            setIsToastOpen(false);
+          }}
+        >
+          <Toast.Header>
+            <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
+            <strong className="me-auto">Admin Panel</strong>
+            <small>Transaction</small>
+          </Toast.Header>
+          <Toast.Body>{toastText}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </article>
   );
 }

@@ -38,8 +38,12 @@ contract RoomBooking is Ownable, AccessControl {
   // Booking methods
   function _createBookings() private {
     for (uint256 i = 1; i <= 10; ++i) {
-      _cokeRooms.push(_createRoomName("C", i));
-      _pepsiRooms.push(_createRoomName("P", i));
+      string memory cokeRoomName = _createRoomName("C", i);
+      string memory pepsiRoomName = _createRoomName("P", i);
+      _cokeBookings[cokeRoomName] = new address[](8);
+      _pepsiBookings[pepsiRoomName] = new address[](8);
+      _cokeRooms.push(cokeRoomName);
+      _pepsiRooms.push(pepsiRoomName);
     }
   }
 
@@ -53,5 +57,19 @@ contract RoomBooking is Ownable, AccessControl {
 
   function getPepsiRooms() public view onlyRole(PEPSI_EMPLOYEE) returns (string[] memory) {
     return _pepsiRooms;
+  }
+
+  function getCokeBookings(string memory _roomName) public view onlyRole(COKE_EMPLOYEE) returns (address[] memory) {
+    address[] memory booking = _cokeBookings[_roomName];
+    require(booking.length > 0, "Invalid room name");
+
+    return booking;
+  }
+
+  function getPepsiBookings(string memory _roomName) public view onlyRole(PEPSI_EMPLOYEE) returns (address[] memory) {
+    address[] memory booking = _pepsiBookings[_roomName];
+    require(booking.length > 0, "Invalid room name");
+
+    return booking;
   }
 }

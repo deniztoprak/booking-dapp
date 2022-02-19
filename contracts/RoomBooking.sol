@@ -43,8 +43,8 @@ contract RoomBooking is Ownable, AccessControl {
     }
   }
 
-  function _createRoomName(string memory prefix, uint256 index) private pure returns (string memory) {
-    return string(abi.encodePacked(prefix, Strings.toString(index)));
+  function _createRoomName(string memory _prefix, uint256 _index) private pure returns (string memory) {
+    return string(abi.encodePacked(_prefix, Strings.toString(_index)));
   }
 
   function getCokeRooms() public view onlyRole(COKE_EMPLOYEE) returns (string[] memory) {

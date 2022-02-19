@@ -1,8 +1,8 @@
-import { Routes, Route, NavLink } from "react-router-dom";
-import { Container, Nav, Navbar } from "react-bootstrap";
-import { Provider } from "wagmi";
-import { StartPage } from "./pages/StartPage/StartPage";
-import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
+import { Routes, Route, NavLink } from 'react-router-dom';
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Provider } from 'wagmi';
+import { StartPage } from './pages/StartPage/StartPage';
+import { AdminPanel } from './pages/AdminPanel/AdminPanel';
 
 export function App() {
   return (
@@ -16,11 +16,11 @@ export function App() {
             <Nav.Link as={NavLink} to="/admin-panel">
               Admin Panel
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/coke-dashboard">
-              Coke Dashboard
+            <Nav.Link as={NavLink} to="/coke-booking">
+              Coke Room Booking
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/pepsi-dashboard">
-              Pepsi Dashboard
+            <Nav.Link as={NavLink} to="/pepsi-booking">
+              Pepsi Room Booking
             </Nav.Link>
           </Nav>
         </Container>

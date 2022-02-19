@@ -14,8 +14,8 @@ contract RoomBooking is Ownable, AccessControl {
   mapping(string => address[]) private _pepsiBookings;
 
   // Booking indexes
-  string[] public _cokeBookingIndex;
-  string[] public _pepsiBookingIndex;
+  string[] public _cokeRooms;
+  string[] public _pepsiRooms;
 
   constructor() {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -38,20 +38,20 @@ contract RoomBooking is Ownable, AccessControl {
   // Booking methods
   function _createBookings() private {
     for (uint256 i = 1; i <= 10; ++i) {
-      _cokeBookingIndex.push(_createBookName("C", i));
-      _pepsiBookingIndex.push(_createBookName("P", i));
+      _cokeRooms.push(_createRoomName("C", i));
+      _pepsiRooms.push(_createRoomName("P", i));
     }
   }
 
-  function _createBookName(string memory prefix, uint256 index) private pure returns (string memory) {
+  function _createRoomName(string memory prefix, uint256 index) private pure returns (string memory) {
     return string(abi.encodePacked(prefix, Strings.toString(index)));
   }
 
-  function getCokeBookings() public view onlyRole(COKE_EMPLOYEE) returns (string[] memory) {
-    return _cokeBookingIndex;
+  function getCokeRooms() public view onlyRole(COKE_EMPLOYEE) returns (string[] memory) {
+    return _cokeRooms;
   }
 
-  function getPepsiBookings() public view onlyRole(PEPSI_EMPLOYEE) returns (string[] memory) {
-    return _pepsiBookingIndex;
+  function getPepsiRooms() public view onlyRole(PEPSI_EMPLOYEE) returns (string[] memory) {
+    return _pepsiRooms;
   }
 }

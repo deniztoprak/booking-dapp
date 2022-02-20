@@ -1,10 +1,9 @@
+import React, { useEffect, useState } from 'react';
 import { getDefaultProvider, utils } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import React, { useEffect, useState } from 'react';
 import { Alert, Button, Container, Form, Row, Toast, ToastContainer } from 'react-bootstrap';
-import { useAccount, useContract, useNetwork, useSigner, useContractEvent } from 'wagmi';
+import { useAccount, useContract, useSigner, useContractEvent } from 'wagmi';
 import { Web3Connector } from '../../components/Web3Connector/Web3Connector';
-import { defaults } from '../../constants/defaults';
 import RoomBooking from '../../contracts/RoomBooking.json';
 
 export function AdminPanel() {
@@ -16,15 +15,13 @@ export function AdminPanel() {
   const [isToastOpen, setIsToastOpen] = useState(false);
   const [toastText, setToastText] = useState('');
 
-  const [{ data: networkData }] = useNetwork();
   const [{ data: accountData }] = useAccount();
   const [{ data: signerData }] = useSigner();
 
-  const networkId = (networkData.chain?.id || defaults.networkId) as keyof typeof RoomBooking.networks;
   const isAdminUser = accountData?.address === ownerAddress;
 
   const contractConfig = {
-    addressOrName: RoomBooking.networks[networkId].address,
+    addressOrName: RoomBooking.networks['1337'].address,
     contractInterface: RoomBooking.abi,
     signerOrProvider: signerData || getDefaultProvider(),
   };
@@ -75,7 +72,7 @@ export function AdminPanel() {
 
   useEffect(() => {
     if (signerData) {
-      contract.owner().then(setOwnerAddress);
+      contract.owner().then(setOwnerAddress).catch(handleError);
     }
   }, [signerData, contract]);
 
@@ -141,7 +138,6 @@ export function AdminPanel() {
           }}
         >
           <Toast.Header>
-            <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
             <strong className="me-auto">Admin Panel</strong>
             <small>Transaction</small>
           </Toast.Header>

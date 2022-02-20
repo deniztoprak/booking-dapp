@@ -30,17 +30,15 @@ contract RoomBooking is Ownable, AccessControl {
     _;
   }
 
-  // Structs
+  // Data
+  bytes32 private constant COKE_ID = keccak256("COKE");
+  bytes32 private constant PEPSI_ID = keccak256("PEPSI");
+
   struct Company {
     string[] rooms;
     mapping(string => address[]) organizers;
   }
 
-  // Company ID's
-  bytes32 private constant COKE_ID = keccak256("COKE");
-  bytes32 private constant PEPSI_ID = keccak256("PEPSI");
-
-  // Companies
   mapping(bytes32 => Company) private companies;
 
   constructor() {

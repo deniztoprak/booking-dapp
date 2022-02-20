@@ -5,45 +5,57 @@ import "../client/node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../client/node_modules/@openzeppelin/contracts/access/AccessControl.sol";
 
 contract RoomBooking is Ownable, AccessControl {
-  // Roles
-  bytes32 private constant COKE_EMPLOYEE = keccak256("COKE_EMPLOYEE");
-  bytes32 private constant PEPSI_EMPLOYEE = keccak256("PEPSI_EMPLOYEE");
+  // Events
+  event TimeSlotBooked(string indexed _roomName, uint256 _slotIndex, address _organizer);
 
-  // Booking maps
-  mapping(string => address[]) private _cokeBookings;
-  mapping(string => address[]) private _pepsiBookings;
+  event BookingCanceled(string indexed _roomName, uint256 _slotIndex);
 
-  // Booking indexes
-  string[] public _cokeRooms;
-  string[] public _pepsiRooms;
+  // Modifiers
+  modifier validCompany(bytes32 _company) {
+    require(_company == COKE_ID || _company == PEPSI_ID, "Unrecognized company");
+    _;
+  }
+
+  modifier validRoom(bytes32 _company, string memory _roomName) {
+    require(companies[_company].organizers[_roomName].length > 0, "Invalid room name");
+    _;
+  }
+
+  modifier validTimeSlot(
+    bytes32 _company,
+    string memory _roomName,
+    uint256 _slotIndex
+  ) {
+    require(_slotIndex < companies[_company].organizers[_roomName].length, "Invalid time slot");
+    _;
+  }
+
+  // Structs
+  struct Company {
+    string[] rooms;
+    mapping(string => address[]) organizers;
+  }
+
+  // Company ID's
+  bytes32 private constant COKE_ID = keccak256("COKE");
+  bytes32 private constant PEPSI_ID = keccak256("PEPSI");
+
+  // Companies
+  mapping(bytes32 => Company) private companies;
 
   constructor() {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    _createBookings();
+    _initCompanies();
   }
 
-  // Role methods
-  function addEmployee(bytes32 _role, address _employeeAddress) public onlyOwner {
-    grantRole(_role, _employeeAddress);
-  }
-
-  function removeEmployee(bytes32 _role, address _employeeAddress) public onlyOwner {
-    revokeRole(_role, _employeeAddress);
-  }
-
-  function isEmployee(bytes32 _role, address _employeeAddress) public view returns (bool) {
-    return hasRole(_role, _employeeAddress);
-  }
-
-  // Booking methods
-  function _createBookings() private {
+  function _initCompanies() private onlyOwner {
     for (uint256 i = 1; i <= 10; ++i) {
       string memory cokeRoomName = _createRoomName("C", i);
       string memory pepsiRoomName = _createRoomName("P", i);
-      _cokeBookings[cokeRoomName] = new address[](8);
-      _pepsiBookings[pepsiRoomName] = new address[](8);
-      _cokeRooms.push(cokeRoomName);
-      _pepsiRooms.push(pepsiRoomName);
+      companies[COKE_ID].organizers[cokeRoomName] = new address[](10);
+      companies[PEPSI_ID].organizers[pepsiRoomName] = new address[](10);
+      companies[COKE_ID].rooms.push(cokeRoomName);
+      companies[PEPSI_ID].rooms.push(pepsiRoomName);
     }
   }
 
@@ -51,25 +63,46 @@ contract RoomBooking is Ownable, AccessControl {
     return string(abi.encodePacked(_prefix, Strings.toString(_index)));
   }
 
-  function getCokeRooms() public view onlyRole(COKE_EMPLOYEE) returns (string[] memory) {
-    return _cokeRooms;
+  function addEmployee(bytes32 _company, address _employeeAddress) public validCompany(_company) onlyOwner {
+    grantRole(_company, _employeeAddress);
   }
 
-  function getPepsiRooms() public view onlyRole(PEPSI_EMPLOYEE) returns (string[] memory) {
-    return _pepsiRooms;
+  function removeEmployee(bytes32 _company, address _employeeAddress) public validCompany(_company) onlyOwner {
+    revokeRole(_company, _employeeAddress);
   }
 
-  function getCokeBookings(string memory _roomName) public view onlyRole(COKE_EMPLOYEE) returns (address[] memory) {
-    address[] memory booking = _cokeBookings[_roomName];
-    require(booking.length > 0, "Invalid room name");
-
-    return booking;
+  function isEmployee(bytes32 _company, address _employeeAddress) public view validCompany(_company) returns (bool) {
+    return hasRole(_company, _employeeAddress);
   }
 
-  function getPepsiBookings(string memory _roomName) public view onlyRole(PEPSI_EMPLOYEE) returns (address[] memory) {
-    address[] memory booking = _pepsiBookings[_roomName];
-    require(booking.length > 0, "Invalid room name");
+  function getRooms(bytes32 _company) public view onlyRole(_company) returns (string[] memory) {
+    return companies[_company].rooms;
+  }
 
-    return booking;
+  function getOrganizers(bytes32 _company, string memory _roomName) public view onlyRole(_company) validRoom(_company, _roomName) returns (address[] memory) {
+    return companies[_company].organizers[_roomName];
+  }
+
+  function bookTimeSlot(
+    bytes32 _company,
+    string memory _roomName,
+    uint256 _slotIndex
+  ) public onlyRole(_company) validRoom(_company, _roomName) validTimeSlot(_company, _roomName, _slotIndex) {
+    require(companies[_company].organizers[_roomName][_slotIndex] == address(0), "Time slot already booked");
+
+    companies[_company].organizers[_roomName][_slotIndex] = msg.sender;
+    emit TimeSlotBooked(_roomName, _slotIndex, msg.sender);
+  }
+
+  function cancelBooking(
+    bytes32 _company,
+    string memory _roomName,
+    uint256 _slotIndex
+  ) public onlyRole(_company) validRoom(_company, _roomName) validTimeSlot(_company, _roomName, _slotIndex) {
+    require(companies[_company].organizers[_roomName][_slotIndex] != address(0), "Time slot is not yet booked");
+    require(companies[_company].organizers[_roomName][_slotIndex] == msg.sender, "Time slot is not booked by sender");
+
+    companies[_company].organizers[_roomName][_slotIndex] = address(0);
+    emit BookingCanceled(_roomName, _slotIndex);
   }
 }

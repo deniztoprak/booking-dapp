@@ -1,6 +1,6 @@
 # Booking Room DApp
 
-This is an Ethereum based decentralized booking application prototype.
+An Ethereum based decentralized booking application prototype.
 
 ## Prerequisites
 

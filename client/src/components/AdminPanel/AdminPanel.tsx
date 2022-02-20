@@ -3,7 +3,7 @@ import { getDefaultProvider, utils } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { Alert, Button, Container, Form, Row, Toast, ToastContainer } from 'react-bootstrap';
 import { useAccount, useContract, useSigner, useContractEvent } from 'wagmi';
-import { Web3Connector } from '../../components/Web3Connector/Web3Connector';
+import { Web3Connector } from '../Web3Connector/Web3Connector';
 import RoomBooking from '../../contracts/RoomBooking.json';
 
 export function AdminPanel() {

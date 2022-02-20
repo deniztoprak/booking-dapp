@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
 import { useNetwork, useSigner } from 'wagmi';
 import { Alert } from 'react-bootstrap';
-import { StartPage } from '../../pages/StartPage/StartPage';
-import { AdminPanel } from '../../pages/AdminPanel/AdminPanel';
-import { CokeBooking } from '../../pages/CokeBooking/CokeBooking';
+import { StartPage } from '../StartPage/StartPage';
+import { AdminPanel } from '../AdminPanel/AdminPanel';
+import { CokeBooking } from '../CokeBooking/CokeBooking';
 
 export function AppShell() {
   const [{ data: networkData }] = useNetwork();
@@ -15,7 +15,7 @@ export function AppShell() {
         <span>
           <Alert className="text-center" variant="danger">
             <p>Wrong network</p>
-            <p>Please select local network: port 8545 </p>
+            <p>Please select local network: port 8545</p>
           </Alert>
         </span>
       )}

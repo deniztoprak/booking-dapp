@@ -5,7 +5,7 @@ import { useAccount, useContract, useSigner, useContractEvent } from 'wagmi';
 import { Web3Connector } from '../Web3Connector/Web3Connector';
 import RoomBooking from '../../contracts/RoomBooking.json';
 
-export function CokeBooking() {
+export function BookingPanel() {
   const BOOKING_START_TIME = 8;
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const [isEmployee, setIsEmployee] = useState();

@@ -3,7 +3,7 @@ import { useNetwork, useSigner } from 'wagmi';
 import { Alert } from 'react-bootstrap';
 import { StartPage } from '../StartPage/StartPage';
 import { AdminPanel } from '../AdminPanel/AdminPanel';
-import { CokeBooking } from '../CokeBooking/CokeBooking';
+import { BookingPanel } from '../BookingPanel/BookingPanel';
 
 export function AppShell() {
   const [{ data: networkData }] = useNetwork();
@@ -22,7 +22,7 @@ export function AppShell() {
       <Routes>
         <Route path="/" element={<StartPage />} />
         <Route path="admin-panel" element={<AdminPanel />} />
-        <Route path="coke-booking" element={<CokeBooking />} />
+        <Route path="coke-booking" element={<BookingPanel />} />
       </Routes>
     </>
   );

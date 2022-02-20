@@ -95,7 +95,12 @@ export function AdminPanel() {
                 <Form ref={adminForm}>
                   <Form.Group className="mt-3" controlId="role">
                     <Form.Label>Select Company</Form.Label>
-                    <Form.Select onChange={onCompanyChange} value={employeeCompany} required>
+                    <Form.Select
+                      onChange={onCompanyChange}
+                      value={employeeCompany}
+                      disabled={isTransactionPending}
+                      required
+                    >
                       <option value="" disabled>
                         Select a company
                       </option>
@@ -112,9 +117,15 @@ export function AdminPanel() {
                       onChange={onAddressChange}
                       minLength={42}
                       maxLength={42}
+                      disabled={isTransactionPending}
                       required
                     />
                   </Form.Group>
+                  {isTransactionPending && (
+                    <Alert className="text-center" variant="warning">
+                      Please wait...
+                    </Alert>
+                  )}
                   <Button disabled={isTransactionPending} variant="success" onClick={onEmployeeAdd}>
                     Add Employee
                   </Button>

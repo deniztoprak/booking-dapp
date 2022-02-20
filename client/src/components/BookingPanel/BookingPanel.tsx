@@ -75,16 +75,22 @@ export const BookingPanel: FC<BookingPanelProps> = ({ companyName }) => {
   };
 
   useEffect(() => {
-    if (signerData && accountData) {
-      contract.isEmployee(companyHash, accountData?.address).then(setIsEmployee).catch(handleError);
-    }
-  }, [signerData]);
+    const initBooking = async () => {
+      const isEmployee = await contract.isEmployee(companyHash, accountData?.address);
+      setIsEmployee(isEmployee);
 
-  useEffect(() => {
-    if (isEmployee) {
-      contract.getRooms(companyHash).then(setRooms).catch(handleError);
+      if (isEmployee) {
+        const rooms = await contract.getRooms(companyHash);
+        setRooms(rooms);
+      }
+    };
+
+    if (signerData && accountData) {
+      setSelectedRoom('');
+      setOrganizers([]);
+      initBooking().catch(handleError);
     }
-  }, [isEmployee]);
+  }, [signerData, companyName]);
 
   return (
     <article>
@@ -104,7 +110,12 @@ export const BookingPanel: FC<BookingPanelProps> = ({ companyName }) => {
                 <Form>
                   <Form.Group className="my-3" controlId="role">
                     <Form.Label>Select Room</Form.Label>
-                    <Form.Select onChange={changeSelectedRoom} value={selectedRoom} required>
+                    <Form.Select
+                      onChange={changeSelectedRoom}
+                      value={selectedRoom}
+                      disabled={isTransactionPending}
+                      required
+                    >
                       <option value="" disabled>
                         Select a room
                       </option>
@@ -116,6 +127,11 @@ export const BookingPanel: FC<BookingPanelProps> = ({ companyName }) => {
                     </Form.Select>
                   </Form.Group>
                 </Form>
+                {isTransactionPending && (
+                  <Alert className="text-center" variant="warning">
+                    Please wait...
+                  </Alert>
+                )}
                 {organizers.length > 0 && (
                   <Table striped bordered hover>
                     <thead>

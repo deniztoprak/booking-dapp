@@ -1,5 +1,5 @@
-import { Alert, Button } from "react-bootstrap";
-import { useAccount, useConnect } from "wagmi";
+import { Alert, Button } from 'react-bootstrap';
+import { useAccount, useConnect } from 'wagmi';
 
 export function Web3Connector() {
   const [{ data: connectData, error: connectError }, connect] = useConnect();
@@ -15,9 +15,7 @@ export function Web3Connector() {
             <div>
               <strong>Your address is:</strong> {accountData.address}
             </div>
-            <div className="mt-2">
-              Connected with {accountData.connector?.name}
-            </div>
+            <div className="mt-2">Connected with {accountData.connector?.name}</div>
             <Button className="mt-2" variant="danger" onClick={disconnect}>
               Disconnect
             </Button>
@@ -28,11 +26,7 @@ export function Web3Connector() {
           <Button variant="success" onClick={() => connect(injectedConnector)}>
             Connect with {injectedConnector.name}
           </Button>
-          {connectError && (
-            <Alert variant="danger">
-              {connectError?.message ?? "Connection failed"}
-            </Alert>
-          )}
+          {connectError && <Alert variant="danger">{connectError?.message ?? 'Connection failed'}</Alert>}
         </>
       ) : (
         <Alert variant="danger">Please install MetaMask</Alert>

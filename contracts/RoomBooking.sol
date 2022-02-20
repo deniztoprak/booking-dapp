@@ -6,9 +6,9 @@ import "../client/node_modules/@openzeppelin/contracts/access/AccessControl.sol"
 
 contract RoomBooking is Ownable, AccessControl {
   // Events
-  event TimeSlotBooked(string indexed _roomName, uint256 _slotIndex, address _organizer);
+  event TimeSlotBooked(string indexed _roomName, uint256 indexed _slotIndex, address _organizer);
 
-  event BookingCanceled(string indexed _roomName, uint256 _slotIndex);
+  event BookingCanceled(string indexed _roomName, uint256 indexed _slotIndex);
 
   // Modifiers
   modifier validCompany(bytes32 _company) {

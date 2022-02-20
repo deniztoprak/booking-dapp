@@ -1,8 +1,7 @@
-import { Routes, Route, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { Provider } from 'wagmi';
-import { StartPage } from './pages/StartPage/StartPage';
-import { AdminPanel } from './pages/AdminPanel/AdminPanel';
+import { AppShell } from './components/AppShell/AppShell';
 
 export function App() {
   return (
@@ -26,10 +25,7 @@ export function App() {
         </Container>
       </Navbar>
       <Provider autoConnect>
-        <Routes>
-          <Route path="/" element={<StartPage />} />
-          <Route path="admin-panel" element={<AdminPanel />} />
-        </Routes>
+        <AppShell></AppShell>
       </Provider>
     </main>
   );

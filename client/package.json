@@ -33,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "deploy-and-run": "wait-on tcp:8545 && truffle compile && truffle migrate && react-scripts start",
-    "ganache": "ganache --chain.chainId \"1337\" --chain.networkId \"1337\" --miner.blockTime \"10\" --wallet.seed \"eyebrow recycle giggle author pause cheap animal can duck grief two agree\"",
+    "ganache": "ganache --chain.chainId \"1337\" --chain.networkId \"1337\" --miner.blockTime \"5\" --wallet.seed \"eyebrow recycle giggle author pause cheap animal can duck grief two agree\"",
     "console": "truffle console"
   },
   "eslintConfig": {

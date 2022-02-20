@@ -31,19 +31,25 @@ export function AdminPanel() {
 
   const contract = useContract(contractConfig);
 
-  useContractEvent(contractConfig, 'RoleGranted', ([role, account]) => {
+  useContractEvent(contractConfig, 'RoleGranted', ([company, account]) => {
     setToastText(`Employee ${account} has been added`);
     setIsToastOpen(true);
     setIsTransactionPending(false);
   });
 
-  useContractEvent(contractConfig, 'RoleRevoked', ([role, account]) => {
+  useContractEvent(contractConfig, 'RoleRevoked', ([company, account]) => {
     setToastText(`Employee ${account} has been removed`);
     setIsToastOpen(true);
     setIsTransactionPending(false);
   });
 
-  const onCompanyChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleError = (error: Error) => {
+    setToastText(error.message);
+    setIsToastOpen(true);
+    setIsTransactionPending(false);
+  };
+
+  const onCompanyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setEmployeeCompany(event.target.value);
   };
 
@@ -51,31 +57,19 @@ export function AdminPanel() {
     setEmployeeAddress(event.target.value);
   };
 
-  const onEmployeeAdd = async (event: React.FormEvent) => {
+  const onEmployeeAdd = () => {
     if (adminForm.current?.reportValidity()) {
       setIsTransactionPending(true);
-      const employeeRole = utils.keccak256(utils.toUtf8Bytes(employeeCompany));
-      try {
-        await contract.addEmployee(employeeRole, getAddress(employeeAddress));
-      } catch (error) {
-        setToastText('Transaction rejected');
-        setIsToastOpen(true);
-        setIsTransactionPending(false);
-      }
+      const companyHash = utils.keccak256(utils.toUtf8Bytes(employeeCompany));
+      contract.addEmployee(companyHash, getAddress(employeeAddress)).catch(handleError);
     }
   };
 
-  const onEmployeeRemove = async (event: React.FormEvent) => {
+  const onEmployeeRemove = () => {
     if (adminForm.current?.reportValidity()) {
       setIsTransactionPending(true);
-      const employeeRole = utils.keccak256(utils.toUtf8Bytes(employeeCompany));
-      try {
-        await contract.removeEmployee(employeeRole, getAddress(employeeAddress));
-      } catch (error) {
-        setToastText('Transaction rejected');
-        setIsToastOpen(true);
-        setIsTransactionPending(false);
-      }
+      const companyHash = utils.keccak256(utils.toUtf8Bytes(employeeCompany));
+      contract.removeEmployee(companyHash, getAddress(employeeAddress)).catch(handleError);
     }
   };
 
@@ -90,7 +84,7 @@ export function AdminPanel() {
       <Container>
         <Row className="text-center">
           <h1 className=" mt-5">Admin Panel</h1>
-          {!accountData && <h3 className="mt-3 mb-4">Please connect with your admin wallet</h3>}
+          {!accountData && <h3 className="mt-3 mb-4">Please connect with your wallet</h3>}
         </Row>
         <Row className="text-center">
           <Web3Connector></Web3Connector>
@@ -104,17 +98,27 @@ export function AdminPanel() {
                 <Form ref={adminForm}>
                   <Form.Group className="mt-3" controlId="role">
                     <Form.Label>Select Company</Form.Label>
-                    <Form.Select onChange={onCompanyChange} required>
-                      <option></option>
-                      <option value="COKE_EMPLOYEE">Coke</option>
-                      <option value="PEPSI_EMPLOYEE">Pepsi</option>
+                    <Form.Select onChange={onCompanyChange} value={employeeCompany} required>
+                      <option value="" disabled>
+                        Select a company
+                      </option>
+                      <option value="COKE">Coke</option>
+                      <option value="PEPSI">Pepsi</option>
                     </Form.Select>
                   </Form.Group>
                   <Form.Group className="my-3" controlId="address">
                     <Form.Label>Employee's Wallet Address:</Form.Label>
-                    <Form.Control type="text" placeholder="Enter wallet address" onChange={onAddressChange} required />
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter wallet address"
+                      value={employeeAddress}
+                      onChange={onAddressChange}
+                      minLength={42}
+                      maxLength={42}
+                      required
+                    />
                   </Form.Group>
-                  <Button disabled={isTransactionPending} variant="info" onClick={onEmployeeAdd}>
+                  <Button disabled={isTransactionPending} variant="success" onClick={onEmployeeAdd}>
                     Add Employee
                   </Button>
                   <Button disabled={isTransactionPending} className="ms-3" variant="danger" onClick={onEmployeeRemove}>

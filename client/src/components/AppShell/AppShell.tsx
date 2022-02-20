@@ -22,7 +22,7 @@ export function AppShell() {
       <Routes>
         <Route path="/" element={<StartPage />} />
         <Route path="admin-panel" element={<AdminPanel />} />
-        <Route path="coke-booking" element={<BookingPanel />} />
+        <Route path="coke-booking" element={<BookingPanel companyName="Coke" />} />
       </Routes>
     </>
   );

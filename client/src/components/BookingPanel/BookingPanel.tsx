@@ -1,13 +1,19 @@
 import { getDefaultProvider, utils } from 'ethers';
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Table, Container, Form, Row, Toast, ToastContainer } from 'react-bootstrap';
 import { useAccount, useContract, useSigner, useContractEvent } from 'wagmi';
 import { Web3Connector } from '../Web3Connector/Web3Connector';
 import RoomBooking from '../../contracts/RoomBooking.json';
 
-export function BookingPanel() {
+interface BookingPanelProps {
+  companyName: string;
+}
+
+export const BookingPanel: FC<BookingPanelProps> = ({ companyName }) => {
   const BOOKING_START_TIME = 8;
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+  const companyHash = useMemo(() => utils.keccak256(utils.toUtf8Bytes(companyName.toUpperCase())), [companyName]);
+
   const [isEmployee, setIsEmployee] = useState();
   const [rooms, setRooms] = useState([]);
   const [organizers, setOrganizers] = useState([]);
@@ -34,7 +40,6 @@ export function BookingPanel() {
   };
 
   useContractEvent(contractConfig, 'TimeSlotBooked', () => {
-    const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
     contract.getOrganizers(companyHash, selectedRoom).then(setOrganizers).catch(handleError);
     setToastText('Time slot booked');
     setIsToastOpen(true);
@@ -42,7 +47,6 @@ export function BookingPanel() {
   });
 
   useContractEvent(contractConfig, 'BookingCanceled', () => {
-    const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
     contract.getOrganizers(companyHash, selectedRoom).then(setOrganizers).catch(handleError);
     setToastText('Booking canceled');
     setIsToastOpen(true);
@@ -50,7 +54,6 @@ export function BookingPanel() {
   });
 
   const changeSelectedRoom = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
     setSelectedRoom(event.target.value);
     contract.getOrganizers(companyHash, event.target.value).then(setOrganizers).catch(handleError);
   };
@@ -63,26 +66,22 @@ export function BookingPanel() {
 
   const bookTimeSlot = (index: number): void => {
     setIsTransactionPending(true);
-    const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
     contract.bookTimeSlot(companyHash, selectedRoom, index).catch(handleError);
   };
 
   const cancelBooking = (index: number): void => {
     setIsTransactionPending(true);
-    const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
     contract.cancelBooking(companyHash, selectedRoom, index).catch(handleError);
   };
 
   useEffect(() => {
     if (signerData && accountData) {
-      const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
       contract.isEmployee(companyHash, accountData?.address).then(setIsEmployee).catch(handleError);
     }
   }, [signerData]);
 
   useEffect(() => {
     if (isEmployee) {
-      const companyHash = utils.keccak256(utils.toUtf8Bytes('COKE'));
       contract.getRooms(companyHash).then(setRooms).catch(handleError);
     }
   }, [isEmployee]);
@@ -91,7 +90,7 @@ export function BookingPanel() {
     <article>
       <Container>
         <Row className="text-center">
-          <h1 className=" mt-5">Coke Room Booking</h1>
+          <h1 className=" mt-5">{companyName} Room Booking</h1>
           {!accountData && <h3 className="mt-3 mb-4">Please connect with your wallet</h3>}
         </Row>
         <Row className="text-center">
@@ -162,7 +161,7 @@ export function BookingPanel() {
               </>
             ) : (
               <Alert className="text-center" variant="danger">
-                You are not a Coke employee
+                You are not a {companyName} employee
               </Alert>
             ))}
         </Row>
@@ -176,7 +175,7 @@ export function BookingPanel() {
         >
           <Toast.Header>
             <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
-            <strong className="me-auto">Coke Booking</strong>
+            <strong className="me-auto">{companyName} Booking</strong>
             <small>Transaction</small>
           </Toast.Header>
           <Toast.Body>{toastText}</Toast.Body>
@@ -184,4 +183,4 @@ export function BookingPanel() {
       </ToastContainer>
     </article>
   );
-}
+};

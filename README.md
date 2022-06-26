@@ -1,6 +1,16 @@
 # Booking DApp
 
-An Ethereum based decentralized booking application.
+An Ethereum based decentralized room booking application.
+
+## General Idea
+
+Two companies (i.e. Coke, Pepsi) are sharing an office building. They are competitors and they don't trust each other. Companies will host a number of business partners in the building for an event. In order to optimize space utilization, they have decided to set-up a joint booking system where any user can book one of the 20 meeting rooms available, 10 from each company (C01, C02, ..., C10 and P01, P02, ...., P10).
+
+The booking system has the following functionalities:
+
+- Users can see meeting rooms availability
+- Users can book meeting rooms by the hour (first come first served)
+- Users can cancel their own reservations
 
 ## Prerequisites
 
